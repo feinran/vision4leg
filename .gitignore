@@ -80,3 +80,6 @@ test/
 *.zip
 *.npy
 *.csv
+
+
+wandb

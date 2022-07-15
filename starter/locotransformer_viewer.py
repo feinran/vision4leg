@@ -77,8 +77,8 @@ PARAM_PATH = "{}/{}/{}/{}/params.json".format(
 # params = get_params(args.config)
 params = get_params(PARAM_PATH)
 
-# params["env"]["env_build"]["enable_rendering"] = False
-params["env"]["env_build"]["enable_rendering"] = True
+params["env"]["env_build"]["enable_rendering"] = False
+# params["env"]["env_build"]["enable_rendering"] = True
 env = get_env(
   params['env_name'],
   params['env'])

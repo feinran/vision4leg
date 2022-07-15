@@ -17,6 +17,7 @@ from torchrl.replay_buffers.on_policy import OnPolicyReplayBuffer
 from torchrl.utils import get_params
 from torchrl.utils import get_args
 import torch
+import wandb
 
 
 args = get_args()
@@ -120,4 +121,16 @@ def experiment(args):
 
 
 if __name__ == "__main__":
+  run = wandb.init(
+      name=args.id,
+      project="wuff",
+      entity="bp-a1",
+      config=params,
+      sync_tensorboard=True,
+      monitor_gym=True,
+      save_code=True,
+  )
+
   experiment(args)
+
+  run.finish()
