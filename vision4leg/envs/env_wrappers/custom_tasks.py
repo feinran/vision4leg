@@ -343,24 +343,27 @@ class DirectionSpeedTask(BaseTask):
         Get the reward without side effects.
         """
 
-        # get direction sensor data
-        direction_sensor = env.sensor_by_name("Direction")
-        dir = direction_sensor.direction
-
-        # get speed sensor data
-        speed_sensor = env.sensor_by_name("Speed")
-        current_speed = speed_sensor.current_speed
-        target_speed = speed_sensor.target_speed
+        ## MOVED! get direction sensor data
+        # direction_sensor = env.sensor_by_name("Direction")
+        # dir = direction_sensor.direction
+        
+        ## MOVED! get speed sensor data
+        # speed_sensor = env.sensor_by_name("Speed")
+        # current_speed = speed_sensor.current_speed
+        # target_speed = speed_sensor.target_speed
         
         # get rot matrix to convert from global coordinates to local coordinates
         rot_quat = env.robot.GetTrueBaseOrientation()
         rot_mat = env.pybullet_client.getMatrixFromQuaternion(rot_quat)
         forward = np.array([rot_mat[i] for i in [0, 3]])  # direction where the robot is looking at
 
+        # get direction sensor data
+        dir = np.array([forward[0], -forward[1]])
+
         # DISABLED! get number of contacts that are not foot contacts
         nofoot_contacts = 0  # env.robot.nofoot_contacts
 
-        # # DISABLED! calculate number of hip motors that exceed ther position limit  
+        ## DISABLED! calculate number of hip motors that exceed ther position limit  
         # epsilon = 0.07
         # motor_angles = np.array(env.robot.GetTrueMotorAngles())
         
@@ -388,19 +391,23 @@ class DirectionSpeedTask(BaseTask):
         if self._energy_enable:
             energy_consumption = env.robot.GetEnergyConsumptionPerControlStep()
         
-        # render debug lines 
-        if env.rendering_enabled:
-            debug_lines(self.current_base_pos, env, forward, None, direction_sensor.target_direction)
+        ## render debug lines 
+        # if env.rendering_enabled:
+        #     debug_lines(self.current_base_pos, env, forward, None, direction_sensor.target_direction)
 
         # get base velocity in local frame
         rot_mat = np.reshape(np.array(rot_mat), (3, 3))
         global_velocity = np.array(env.robot.GetBaseVelocity())
         local_velocity = np.matmul(rot_mat, global_velocity)[:-1]
         local_movement_dir = local_velocity / np.linalg.norm(local_velocity)
+
+        # get speed sensor data
+        current_speed = np.linalg.norm(global_velocity)
+        target_speed = 1
         
         # compute rewards
         movement_dot = self.similarity_func(dir, local_movement_dir, self._l_move_scheduler.value)
-        alignment_dot = self.similarity_func(dir, direction_sensor.create_direction(0), self._l_align_scheduler.value)
+        alignment_dot = self.similarity_func(dir, np.array([1, 0]), self._l_align_scheduler.value)
         speed_reward = self.similarity_func(current_speed, target_speed, self._l_speed_scheduler.value)
         energy_reward = - energy_consumption if energy_consumption is not None else 0
         

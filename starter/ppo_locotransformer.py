@@ -121,16 +121,20 @@ def experiment(args):
 
 
 if __name__ == "__main__":
-  run = wandb.init(
-      name=args.id,
-      project="wuff",
-      entity="bp-a1",
-      config=params,
-      sync_tensorboard=True,
-      monitor_gym=True,
-      save_code=True,
-  )
+  use_wandb = True
+
+  if use_wandb:
+    run = wandb.init(
+        name=args.id,
+        project="wuff",
+        entity="bp-a1",
+        config=params,
+        sync_tensorboard=True,
+        monitor_gym=True,
+        save_code=True,
+    )
 
   experiment(args)
 
-  run.finish()
+  if use_wandb:
+    run.finish()
