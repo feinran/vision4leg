@@ -121,7 +121,7 @@ def experiment(args):
 
 
 if __name__ == "__main__":
-  use_wandb = True
+  use_wandb = False
 
   if use_wandb:
     run = wandb.init(
